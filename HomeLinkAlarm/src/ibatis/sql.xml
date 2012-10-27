@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="dbTest">
+	<select id="sql_for_max" resultClass="HashMap" parameterClass="HashMap">
+	SELECT
+	g.HNAME1,
+	g.CHARGER,
+	g.count,
+	g.num,
+	g.NUMBER_FIVE_MIN,
+	g.NUMBER_FIVE_MAX,
+	g2.count25,
+	g2.num25,
+	g2.NUMBER_TWENTYFIVE_MIN,
+	g2.NUMBER_TWENTYFIVE_MAX,
+	g3.count75,
+	g3.num75,
+	g3.NUMBER_SEVENTYFIVE_MIN,
+	g3.NUMBER_SEVENTYFIVE_MAX
+FROM
+	(
+		SELECT DISTINCT
+			*
+		FROM
+			(
+				SELECT
+					a.*, b.num,
+					round((a.count / b.num) * 100, 0) rate
+				FROM
+					(
+						SELECT
+							HOUSE_NAME AS HNAME1,
+							CROP,
+							COUNT(*) count
+						FROM
+							tbhouse_data_anjuke
+						WHERE
+							EXT2 &lt;= #mynum5#
+						AND EXT3 = #mydate#
+						GROUP BY
+							HOUSE_NAME,
+							CROP
+					) a
+				LEFT JOIN (
+					SELECT
+						HOUSE_NAME AS HNAME2,
+						COUNT(*) num
+					FROM
+						tbhouse_data_anjuke
+					WHERE
+						EXT2 &lt;= #mynum5#
+					AND EXT3 = #mydate#
+					GROUP BY
+						HOUSE_NAME
+				) b ON a.HNAME1 = b.HNAME2
+				WHERE
+					a.CROP = #mycrop#
+			) v
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME AS HNAME3,
+				NUMBER_FIVE_MIN,
+				NUMBER_FIVE_MAX,
+				CHARGER
+			FROM
+				alarm_target
+		) t ON t.HNAME3 = v.HNAME1
+	) g
+LEFT JOIN (
+	SELECT DISTINCT
+		*
+	FROM
+		(
+			SELECT
+				a.*, b.num AS num25,
+				round((a.count25 / b.num) * 100, 0) rate
+			FROM
+				(
+					SELECT
+						HOUSE_NAME AS HNAME1,
+						CROP,
+						COUNT(*) count25
+					FROM
+						tbhouse_data_anjuke
+					WHERE
+						EXT2 &lt;= #mynum25#
+					AND EXT3 = #mydate#
+					GROUP BY
+						HOUSE_NAME,
+						CROP
+				) a
+			LEFT JOIN (
+				SELECT
+					HOUSE_NAME AS HNAME2,
+					COUNT(*) num
+				FROM
+					tbhouse_data_anjuke
+				WHERE
+					EXT2 &lt;= #mynum25#
+				AND EXT3 = #mydate#
+				GROUP BY
+					HOUSE_NAME
+			) b ON a.HNAME1 = b.HNAME2
+			WHERE
+				a.CROP = #mycrop#
+		) v
+	LEFT JOIN (
+		SELECT
+			HOUSE_NAME AS HNAME3,
+			NUMBER_TWENTYFIVE_MIN,
+			NUMBER_TWENTYFIVE_MAX
+		FROM
+			alarm_target
+	) t ON t.HNAME3 = v.HNAME1
+) g2 ON g.HNAME1 = g2.HNAME1
+LEFT JOIN (
+	SELECT DISTINCT
+		*
+	FROM
+		(
+			SELECT
+				a.*, b.num AS num75,
+				round((a.count75 / b.num) * 100, 0) rate
+			FROM
+				(
+					SELECT
+						HOUSE_NAME AS HNAME1,
+						CROP,
+						COUNT(*) count75
+					FROM
+						tbhouse_data_anjuke
+					WHERE
+						EXT2 &lt;= #mynum75#
+					AND EXT3 = #mydate#
+					GROUP BY
+						HOUSE_NAME,
+						CROP
+				) a
+			LEFT JOIN (
+				SELECT
+					HOUSE_NAME AS HNAME2,
+					COUNT(*) num
+				FROM
+					tbhouse_data_anjuke
+				WHERE
+					EXT2 &lt;= #mynum75#
+				AND EXT3 = #mydate#
+				GROUP BY
+					HOUSE_NAME
+			) b ON a.HNAME1 = b.HNAME2
+			WHERE
+				a.CROP = #mycrop#
+		) v
+	LEFT JOIN (
+		SELECT
+			HOUSE_NAME AS HNAME3,
+			NUMBER_SEVENTYFIVE_MIN,
+			NUMBER_SEVENTYFIVE_MAX
+		FROM
+			alarm_target
+	) t ON t.HNAME3 = v.HNAME1
+) g3 ON g2.HNAME1 = g3.HNAME1 ORDER BY g.CHARGER
+	</select>
+	<select id="sql" resultClass="HashMap" parameterClass="HashMap">
+		SELECT g.HNAME1, g.count,g.num,g.NUMBER_FIVE,g2.count25,g2.num25,g2.NUMBER_TWENTYFIVE,g3.count75,g3.num75,NUMBER_SEVENTYFIVE FROM (
+SELECT DISTINCT
+	*
+FROM
+	(
+		SELECT
+			a.*, b.num,
+			round((a.count / b.num) * 100, 0) rate
+		FROM
+			(
+				SELECT
+					HOUSE_NAME as HNAME1,
+					CROP,
+					COUNT(*) count
+				FROM
+					tbhouse_data_anjuke
+				WHERE EXT2 &lt;= #mynum5# AND EXT3 = #mydate# 
+				GROUP BY
+					HOUSE_NAME,
+					CROP
+			) a
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME as HNAME2,
+				COUNT(*) num
+			FROM
+				tbhouse_data_anjuke
+			WHERE EXT2 &lt;=#mynum5# AND EXT3 = #mydate#  
+			GROUP BY
+				HOUSE_NAME
+		) b ON a.HNAME1 = b.HNAME2
+WHERE
+	a.CROP = '链家地产'
+	) v
+ LEFT JOIN
+(
+	SELECT 
+	HOUSE_NAME as HNAME3,
+	NUMBER_FIVE
+	FROM alarm_target
+) t ON t.HNAME3 = v.HNAME1
+) g  LEFT JOIN (
+
+SELECT DISTINCT
+	*
+FROM
+	(
+		SELECT
+			a.*, b.num AS num25,
+			round((a.count25 / b.num) * 100, 0) rate
+		FROM
+			(
+				SELECT
+					HOUSE_NAME as HNAME1,
+					CROP,
+					COUNT(*) count25
+				FROM
+					tbhouse_data_anjuke
+				WHERE EXT2 &lt;= #mynum25# AND EXT3 = #mydate# 
+				GROUP BY
+					HOUSE_NAME,
+					CROP
+			) a
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME as HNAME2,
+				COUNT(*) num
+			FROM
+				tbhouse_data_anjuke
+			WHERE EXT2 &lt;= #mynum25# AND EXT3 = #mydate#   
+			GROUP BY
+				HOUSE_NAME
+		) b ON a.HNAME1 = b.HNAME2
+WHERE
+	a.CROP = '链家地产'
+	) v
+ LEFT JOIN
+(
+	SELECT 
+	HOUSE_NAME as HNAME3,
+	NUMBER_TWENTYFIVE
+	FROM alarm_target
+) t ON t.HNAME3 = v.HNAME1
+) g2 ON g.HNAME1 = g2.HNAME1
+LEFT JOIN (
+
+SELECT DISTINCT
+	*
+FROM
+	(
+		SELECT
+			a.*, b.num AS num75,
+			round((a.count75 / b.num) * 100, 0) rate
+		FROM
+			(
+				SELECT
+					HOUSE_NAME as HNAME1,
+					CROP,
+					COUNT(*) count75
+				FROM
+					tbhouse_data_anjuke
+				WHERE EXT2 &lt;= #mynum75# AND EXT3 = #mydate# 
+				GROUP BY
+					HOUSE_NAME,
+					CROP
+			) a
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME as HNAME2,
+				COUNT(*) num
+			FROM
+				tbhouse_data_anjuke
+			WHERE EXT2 &lt;= #mynum75# AND EXT3 = #mydate#   
+			GROUP BY
+				HOUSE_NAME
+		) b ON a.HNAME1 = b.HNAME2
+WHERE
+	a.CROP = '链家地产'
+	) v
+ LEFT JOIN
+(
+	SELECT 
+	HOUSE_NAME as HNAME3,
+	NUMBER_SEVENTYFIVE
+	FROM alarm_target
+) t ON t.HNAME3 = v.HNAME1
+
+) g3 ON g2.HNAME1 = g3.HNAME1
+	
+	</select>
+	
+	<select id="sql1" resultClass="HashMap" parameterClass="HashMap">
+		SELECT DISTINCT
+	*
+FROM
+	(
+		SELECT
+			a.*, b.num,
+			round((a.count / b.num) * 100, 0) rate
+		FROM
+			(
+				SELECT
+					HOUSE_NAME,
+					CROP,
+					COUNT(*) count
+				FROM
+					tbhouse_data_anjuke
+				WHERE EXT2 &lt;= #mynumber# AND EXT3 = #mydate1# 
+				GROUP BY
+					HOUSE_NAME,
+					CROP
+			) a
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME,
+				COUNT(*) num
+			FROM
+				tbhouse_data_anjuke
+			WHERE EXT2 &lt;= #mynumber#  AND EXT3 = #mydate1# 
+			GROUP BY
+				HOUSE_NAME
+		) b ON a.HOUSE_NAME = b.HOUSE_NAME
+WHERE
+	a.CROP = '链家地产'
+	) v
+ LEFT JOIN
+(
+	SELECT 
+	HOUSE_NAME,
+	NUMBER_TWENTYFIVE
+	FROM alarm_target
+) t ON t.HOUSE_NAME = v.HOUSE_NAME
+
+	</select>
+	
+	<select id="sql2" resultClass="HashMap" parameterClass="HashMap">
+		SELECT DISTINCT
+	*
+FROM
+	(
+		SELECT
+			a.*, b.num,
+			round((a.count / b.num) * 100, 0) rate
+		FROM
+			(
+				SELECT
+					HOUSE_NAME,
+					CROP,
+					COUNT(*) count
+				FROM
+					tbhouse_data_anjuke
+				WHERE EXT2 &lt;= #mynumber# AND EXT3 = #mydate1# 
+				GROUP BY
+					HOUSE_NAME,
+					CROP
+			) a
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME,
+				COUNT(*) num
+			FROM
+				tbhouse_data_anjuke
+			WHERE EXT2 &lt;= #mynumber#  AND EXT3 = #mydate1# 
+			GROUP BY
+				HOUSE_NAME
+		) b ON a.HOUSE_NAME = b.HOUSE_NAME
+WHERE
+	a.CROP = '链家地产'
+	) v
+ LEFT JOIN
+(
+	SELECT 
+	HOUSE_NAME,
+	NUMBER_TWENTYFIVE
+	FROM alarm_target
+) t ON t.HOUSE_NAME = v.HOUSE_NAME
+
+	</select>
+	<select id="sql3" resultClass="HashMap" parameterClass="HashMap">
+		SELECT DISTINCT
+	*
+FROM
+	(
+		SELECT
+			a.*, b.num,
+			round((a.count / b.num) * 100, 0) rate
+		FROM
+			(
+				SELECT
+					HOUSE_NAME,
+					CROP,
+					COUNT(*) count
+				FROM
+					tbhouse_data_anjuke
+				WHERE EXT2 &lt;= #mynumber# AND EXT3 = #mydate1# 
+				GROUP BY
+					HOUSE_NAME,
+					CROP
+			) a
+		LEFT JOIN (
+			SELECT
+				HOUSE_NAME,
+				COUNT(*) num
+			FROM
+				tbhouse_data_anjuke
+			WHERE EXT2 &lt;= #mynumber#  AND EXT3 = #mydate1# 
+			GROUP BY
+				HOUSE_NAME
+		) b ON a.HOUSE_NAME = b.HOUSE_NAME
+WHERE
+	a.CROP = '链家地产'
+	) v
+ LEFT JOIN
+(
+	SELECT 
+	HOUSE_NAME,
+	NUMBER_SEVENTYFIVE
+	FROM alarm_target
+) t ON t.HOUSE_NAME = v.HOUSE_NAME
+
+	</select>
+</sqlMap>
